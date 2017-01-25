@@ -38,28 +38,20 @@ boolean PACKETACTIVE = false; //Geeft aan dat een packet actief is dus wordt ver
 //Functies, voids
 //**************************
 void MAKEPACKETS() { //gebruikt is ontwikkeling om voorbeeld packets te maken.
-  int i = 0;
-  while (i < AP) {
-    DCCPACKET[i].LOOPS = random(4);
-    DCCPACKET[i].ADRES = random(2560);
-    DCCPACKET[i].STATE = true;
-    ++ i;
-  }
+
+    DCCPACKET[0].LOOPS =4;
+    DCCPACKET[0].ADRES =300;
+    DCCPACKET[0].STATE =true;
+
+	PRINT();
 
 }
 
 void PRINT() { // alleen bij ontwikkeling.
-  int i = 0;
-
-  while ( i < AP) {
-    delay(1000);
-    Serial.println();
-    Serial.println(i);
-    Serial.println(DCCPACKET[i].LOOPS);
-    Serial.println(DCCPACKET[i].ADRES);
-    Serial.println(DCCPACKET[i].STATE);
-    ++ i ;
-  }
+	Serial.println(DCCPACKET[0].LOOPS);
+	Serial.println(DCCPACKET[0].ADRES);
+	Serial.println(DCCPACKET[0].STATE);
+	Serial.println("===============");
 }
 
 
@@ -181,6 +173,12 @@ void CONSTRUCTBYTES() {
   BYTEA1[7] = true;
   BYTEA1[6] = false;
   BYTED1[7] = true;
+  int i = 0;
+  while (i < 8) {
+	  BYTEE[i] = BYTEA1[i] ^ BYTED1[i];
+	  i++;
+  }
+
   PRINTBYTES();
 }// einde void constructbytes
 
@@ -211,7 +209,11 @@ void setup() {
   pinMode(13, OUTPUT); // rode led
   pinMode(5, INPUT); //kortsluiting voeler
   pinMode(6, INPUT); //programmeerknop
+  
   Serial.begin(9600);
+  while (!Serial)  {
+	  ;
+  }
   //**alleen tijdens ontwikkeling
   MAKEPACKETS();
   // START();
