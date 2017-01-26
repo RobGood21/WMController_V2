@@ -1,0 +1,33 @@
+﻿
+Compiling debug version of 'WMController_V2' for 'Arduino/Genuino Uno'
+ 
+WMController_V2.ino: 242:1: error: 'Serial' does not name a type
+Error compiling project sources
+   Serial.println()
+ 
+Debug build failed for project 'WMController_V2'
+WMController_V2.ino: 243:1: error: 'Serial' does not name a type
+   ")
+ 
+WMController_V2.ino: 244:1: error: 'Serial' does not name a type
+   Serial.println(REST)
+ 
+WMController_V2.ino: 247:1: error: 'BYTEA1' does not name a type
+   BYTEA1[7] = true
+ 
+WMController_V2.ino: 248:1: error: 'BYTEA1' does not name a type
+   BYTEA1[6] = false
+ 
+WMController_V2.ino: 249:1: error: 'BYTED1' does not name a type
+   BYTED1[7] = true
+ 
+WMController_V2.ino: 250:1: error: 'i' does not name a type
+   i = 0
+ 
+WMController_V2.ino: 251:1: error: expected unqualified-id before 'while
+   while (i < 8) {
+ 
+WMController_V2.ino: 256:13: error: expected constructor, destructor, or type conversion before ';' token
+   PRINTBYTES()
+ 
+WMController_V2.ino: 257:1: error: expected declaration before '}' token

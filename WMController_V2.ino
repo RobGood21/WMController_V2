@@ -40,8 +40,8 @@ boolean PACKETACTIVE = false; //Geeft aan dat een packet actief is dus wordt ver
 void MAKEPACKETS() { //gebruikt is ontwikkeling om voorbeeld packets te maken.
 
     DCCPACKET[0].LOOPS =4;
-    DCCPACKET[0].ADRES =300;
-    DCCPACKET[0].STATE =true;
+    DCCPACKET[0].ADRES =423;
+    DCCPACKET[0].STATE =false;
 
 	PRINT();
 
@@ -118,7 +118,7 @@ void DCCLOOP() {
 
       i = 0;
       while (i < AP) {
-        if (PACKETACTIVE == false and DCCPACKET[POINTERREAD].LOOPS > 0) { //dus een nieuw te zenden packet gevonden
+        if ((PACKETACTIVE == false) & (DCCPACKET[POINTERREAD].LOOPS > 0)) { //dus een nieuw te zenden packet gevonden
           NEWPACKET = POINTERREAD;
           PACKETACTIVE = true; //Packet actief is waar
           CONSTRUCTBYTES();
@@ -161,25 +161,110 @@ void CONSTRUCTBYTES() {
 
   int REST = DCCPACKET[NEWPACKET].ADRES;
   int BITWAARDE = 2048;
-
+  int i = 0; //teller
+  
+  /*
   if (REST - BITWAARDE >  0) {
     BYTED1[6] = false; //adres hoger dan 2048, dit bit wordt geinverteerd (one complement)
     REST = REST - BITWAARDE; //adres verminderen met waarde van dit JA bit
   } else {
     BYTED1[6] = true;
   }
+    BITWAARDE = BITWAARDE / 2;
+
+  //Bitwaarde nu 1024 bepalen bit 5 van Byte 2, one complement dus geinverteerd. 
+  if (REST - BITWAARDE > 0) {
+	  BYTED1[5] = false; //bitwaarde is hoger dan waarde van bit 5, geinverteerde weergegeven
+	  REST = REST - BITWAARDE;
+	    }else {
+	  BYTED1[5] = true;
+	  } 
   BITWAARDE = BITWAARDE / 2;
- 
+
+ //BITWAARDE nu 512 bepalen bit 4 van byte 2, one complement
+  if (REST - BITWAARDE > 0) {
+	  //Serial.print("HIER!");
+	  BYTED1[4] = 0;
+	  REST = REST - BITWAARDE;
+  }  else {
+	  BYTED1[4] = 1;
+  }
+  BITWAARDE = BITWAARDE / 2;
+  
+  */
+  //samenstellen adresbits 4-5-6 van BYTED1, geinverteerd volgens normblad one complement.
+  i = 6;
+  while (i > 3) {
+  if (REST - BITWAARDE >= 0) {
+	  //Serial.print("HIER!");
+	  BYTED1[i] = 0;
+	  REST = REST - BITWAARDE;
+  }
+  else {
+	  BYTED1[i] = 1;
+  }
+ BITWAARDE = BITWAARDE / 2;
+  i--;
+  }
+  //samenstellen adresbits (0-1-2-3-4-5) van BYTEA1 (niet geinverteerd)
+  i = 5;
+  while (i >= 0) {
+	  if (REST - BITWAARDE >= 0) {
+		  BYTEA1[i] = true;
+		  REST = REST - BITWAARDE;
+	  }
+	  else
+		  BYTEA1[i] = false;
+	  {
+  	  }
+	  BITWAARDE = BITWAARDE / 2;
+	  i--;
+  }
+  //samenstellen bit 0-3 van BYTED1, databyte. 
+  //bit 0 is een beethe onduidelijk wat wordt bedoeld, keuze van de twee helften van een wissel ?
+  //bit 1-2 geven aan welke van de 4 binnen 1 decoder... ? Ook ingewikkeld maar gewoon bit 2,4,8 lijkt mij ...
+  //we zien wel hoe in de praktijk een commercieel decoder hierop reageert
+  i = 2;
+  while (i > 0) {
+	  if (REST - BITWAARDE >= 0) {
+		  BYTED1[i] = true;
+		  REST = REST - BITWAARDE;
+	  }	  else
+	  {		  BYTED1[i] = false;
+	  }
+	 
+	  BITWAARDE = BITWAARDE / 2; // BITWAARDE ee int dus bij waarde 1 stoppen
+	  i--;
+	  //blijft over BIT 0 van BYTED1 is de rest van de aftrekking....toch?
+	  if (REST == 1) {
+		  BYTED1[0] = true;
+	  }
+	  else {
+		  BYTED1[0] = false;
+	  }
+	  {
+
+	  }
+  }
+
+  Serial.println();
+  Serial.print("Restwaarde adres:");
+  Serial.println(REST);
+
+  //invullen vaste bits voor aanduiding wat voor packet, message.
   BYTEA1[7] = true;
   BYTEA1[6] = false;
   BYTED1[7] = true;
-  int i = 0;
+  BYTED1[4] = DCCPACKET[NEWPACKET].STATE; //aan of uit.
+  i = 0;
   while (i < 8) {
 	  BYTEE[i] = BYTEA1[i] ^ BYTED1[i];
 	  i++;
   }
 
   PRINTBYTES();
+
+
 }// einde void constructbytes
 
 void PRINTBYTES() {
