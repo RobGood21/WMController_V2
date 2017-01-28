@@ -1,0 +1,103 @@
+﻿Launching Debugger...
+   - Serial debug will start immediately. WiFi (or gdb) debug will start a few seconds or a short time after the remote device connects to the network.
+   - Switch on 'vmicro>debugger>full speed' to prevent debugger message throttling. (read the docs)
+   - If 'in-break live watch' is disabled, continue an existing paused debug session by sending the character 'c' to the board using the Serial window.
+   - To view debug messages without trace messages use the 'message windows' option on the monitor window.
+22:52:12.975    WMController_V2.ino, line 341		millis()=2010
+     Millis is currently 2010.
+22:52:12.990 [up:02s:260ms perf:244ms]   WMController_V2.ino, line 341		millis()=2260
+     Millis is currently 2260.
+22:52:13.041 [up:02s:510ms perf:244ms]   WMController_V2.ino, line 341		millis()=2510
+     Millis is currently 2510.
+22:52:13.290 [up:02s:760ms perf:245ms]   WMController_V2.ino, line 341		millis()=2760
+     Millis is currently 2760.
+22:52:13.541 [up:03s:010ms perf:245ms]   WMController_V2.ino, line 341		millis()=3010
+     Millis is currently 3010.
+22:52:13.790 [up:03s:260ms perf:245ms]   WMController_V2.ino, line 341		millis()=3260
+     Millis is currently 3260.
+22:52:14.041 [up:03s:510ms perf:245ms]   WMController_V2.ino, line 341		millis()=3510
+     Millis is currently 3510.
+22:52:14.290 [up:03s:760ms perf:245ms]   WMController_V2.ino, line 341		millis()=3760
+     Millis is currently 3760.
+22:52:14.540 [up:04s:011ms perf:246ms]   WMController_V2.ino, line 341		millis()=4011
+     Millis is currently 4011.
+22:52:14.790 [up:04s:261ms perf:245ms]   WMController_V2.ino, line 341		millis()=4261
+     Millis is currently 4261.
+22:52:15.039 [up:04s:511ms perf:244ms]   WMController_V2.ino, line 341		millis()=4511
+     Millis is currently 4511.
+22:52:15.290 [up:04s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=4761
+     Millis is currently 4761.
+22:52:15.610 [up:05s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=5011
+     Millis is currently 5011.
+22:52:15.825 [up:05s:261ms perf:245ms]   WMController_V2.ino, line 341		millis()=5261
+     Millis is currently 5261.
+22:52:16.049 [up:05s:511ms perf:245ms]   WMController_V2.ino, line 341		millis()=5511
+     Millis is currently 5511.
+22:52:16.289 [up:05s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=5761
+     Millis is currently 5761.
+22:52:16.539 [up:06s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=6011
+     Millis is currently 6011.
+22:52:16.859 [up:06s:261ms perf:244ms]   WMController_V2.ino, line 341		millis()=6261
+     Millis is currently 6261.
+22:52:17.082 [up:06s:511ms perf:245ms]   WMController_V2.ino, line 341		millis()=6511
+     Millis is currently 6511.
+22:52:17.298 [up:06s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=6761
+     Millis is currently 6761.
+22:52:17.538 [up:07s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=7011
+     Millis is currently 7011.
+22:52:17.859 [up:07s:261ms perf:245ms]   WMController_V2.ino, line 341		millis()=7261
+     Millis is currently 7261.
+22:52:18.082 [up:07s:511ms perf:245ms]   WMController_V2.ino, line 341		millis()=7511
+     Millis is currently 7511.
+22:52:18.300 [up:07s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=7761
+     Millis is currently 7761.
+22:52:18.538 [up:08s:011ms perf:244ms]   WMController_V2.ino, line 341		millis()=8011
+     Millis is currently 8011.
+22:52:18.788 [up:08s:261ms perf:245ms]   WMController_V2.ino, line 341		millis()=8261
+     Millis is currently 8261.
+22:52:19.038 [up:08s:511ms perf:245ms]   WMController_V2.ino, line 341		millis()=8511
+     Millis is currently 8511.
+22:52:19.287 [up:08s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=8761
+     Millis is currently 8761.
+22:52:19.607 [up:09s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=9011
+     Millis is currently 9011.
+22:52:19.836 [up:09s:261ms perf:245ms]   WMController_V2.ino, line 341		millis()=9261
+     Millis is currently 9261.
+22:52:20.075 [up:09s:511ms perf:245ms]   WMController_V2.ino, line 341		millis()=9511
+     Millis is currently 9511.
+22:52:20.300 [up:09s:761ms perf:244ms]   WMController_V2.ino, line 341		millis()=9761
+     Millis is currently 9761.
+22:52:20.541 [up:10s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=10011
+     Millis is currently 10011.
+22:52:20.791 [up:10s:261ms perf:245ms]   WMController_V2.ino, line 341		millis()=10261
+     Millis is currently 10261.
+22:52:21.040 [up:10s:511ms perf:245ms]   WMController_V2.ino, line 341		millis()=10511
+     Millis is currently 10511.
+22:52:21.291 [up:10s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=10761
+     Millis is currently 10761.
+22:52:21.540 [up:11s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=11011
+     Millis is currently 11011.
+22:52:21.791 [up:11s:261ms perf:245ms]   WMController_V2.ino, line 341		millis()=11261
+     Millis is currently 11261.
+22:52:22.040 [up:11s:511ms perf:244ms]   WMController_V2.ino, line 341		millis()=11511
+     Millis is currently 11511.
+22:52:22.290 [up:11s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=11761
+     Millis is currently 11761.
+22:52:22.540 [up:12s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=12011
+     Millis is currently 12011.
+22:52:22.790 [up:12s:261ms perf:245ms]   WMController_V2.ino, line 341		millis()=12261
+     Millis is currently 12261.
+22:52:23.040 [up:12s:511ms perf:245ms]   WMController_V2.ino, line 341		millis()=12511
+     Millis is currently 12511.
+22:52:23.289 [up:12s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=12761
+     Millis is currently 12761.
+22:52:23.539 [up:13s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=13011
+     Millis is currently 13011.
+22:52:23.862 [up:13s:261ms perf:244ms]   WMController_V2.ino, line 341		millis()=13261
+     Millis is currently 13261.
+22:52:24.076 [up:13s:511ms perf:245ms]   WMController_V2.ino, line 341		millis()=13511
+     Millis is currently 13511.
+22:52:24.301 [up:13s:761ms perf:245ms]   WMController_V2.ino, line 341		millis()=13761
+     Millis is currently 13761.
+22:52:24.539 [up:14s:011ms perf:245ms]   WMController_V2.ino, line 341		millis()=14011
+     Millis is currently 14011.

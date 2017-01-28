@@ -10,9 +10,24 @@
 
 // Variabelen
 //**********************
+int WELKEKNOP = 0; //telt de knoppen dit NIET in library ?? 
+boolean TKNOPSTATUS1 = false;
+boolean TKNOPSTATUS2 = false;
+boolean TKNOPSTATUS3 = false;
+boolean TKNOPSTATUS4 = false;
+boolean TKNOPSTATE1 = false; //is er laatst een aan of uit gestuurd, voor 1 knops bediening
+boolean TKNOPSTATE2 = false;
+boolean TKNOPSTATE3 = false;
+boolean TKNOPSTATE4 = false;
+
 unsigned long KNOPTIMER;
 boolean KNOPSTATUS = false; //geeft de vorige stand van de programmeerknop
 boolean STOP = true;
+//**tijdelijke knoppen
+boolean TKNOP1=false; //geeft de stand van de knop bij de vorige doorloop
+boolean TKNOP2=false;
+boolean TKNOP3=false;
+
 int BITFALSE = 120; // duur van de helft van een pauze bit enof nul bit
 unsigned long BITTIMER; // houdt verlopen tijd bij gedurende een bit
 int DCCFASE = 0; // welke fase  in DC verzending
@@ -37,22 +52,34 @@ boolean PACKETACTIVE = false; //Geeft aan dat een packet actief is dus wordt ver
 
 //Functies, voids
 //**************************
-void MAKEPACKETS() { //gebruikt is ontwikkeling om voorbeeld packets te maken.
+void MAKEPACKET(int loops, int adres, boolean state) { //gebruikt is ontwikkeling om voorbeeld packets te maken.
+//aleerst een vrij packett zoeken, beginnen bij laatse POINTERWRITE
+	int TELLER = 0;
+	boolean FOUNDFREE = false;
+	do
+	{
+	++ POINTERWRITE;
+	if (POINTERWRITE > AP) POINTERWRITE = 0;
 
-    DCCPACKET[0].LOOPS =4;
-    DCCPACKET[0].ADRES =423;
-    DCCPACKET[0].STATE =false;
+	if (DCCPACKET[POINTERWRITE].LOOPS == 0) //Door POINTERWRITE aangewezen packet is vrij.
+	{
+		FOUNDFREE = true;
+		DCCPACKET[POINTERWRITE].LOOPS=loops;
+		DCCPACKET[POINTERWRITE].ADRES = adres;
+		DCCPACKET[POINTERWRITE].STATE = state;
+		Serial.println(DCCPACKET[POINTERWRITE].ADRES = adres);
+		Serial.println(POINTERWRITE);
 
-	PRINT();
+		TELLER = AP + 2; // om uit de do while te springen
+	} // niet vrij gebeurt niks, volgende POINTERWRITE testen.
 
+	++TELLER;
+
+	} while (TELLER < AP); //als er meer dan aantal packets vol zijn, foutmelding geven. 
+	if (FOUNDFREE == false) Serial.println("Er gaat iets mis in MAKEPACKET, geen vrij packet gevonden verhoog AP");
 }
 
-void PRINT() { // alleen bij ontwikkeling.
-	Serial.println(DCCPACKET[0].LOOPS);
-	Serial.println(DCCPACKET[0].ADRES);
-	Serial.println(DCCPACKET[0].STATE);
-	Serial.println("===============");
-}
+
 
 
 void SETOUTPUTS(boolean HL) {
@@ -68,7 +95,57 @@ void NOODSTOP() {
   digitalWrite(13, HIGH);
 } //einde void Noodstop
 
-
+//****onderstaande niet in library
+void TKNOP() { //deze functie NIET IN DE LIBRARY
+//tijdelijk maakt een accessory opdracht. 
+	//******** knop 1
+		if (digitalRead(8)!=TKNOPSTATUS1) { //status knop dus veranderd
+			if (TKNOPSTATUS1==false){
+				TKNOPSTATUS1 = true; //knop dus ingedrukt
+				//nu iets doen, dcc boodschap aanmaken bv. 
+				TKNOPSTATE1 = !TKNOPSTATE1;
+				MAKEPACKET(4,1, TKNOPSTATE1);
+				}else {
+				TKNOPSTATUS1 = false; //knop dus losgelaten
+			}
+		}
+  //*************KNOP2
+		if (digitalRead(9) != TKNOPSTATUS2) { //status knop dus veranderd
+			if (TKNOPSTATUS2 == false) {
+				TKNOPSTATUS2 = true; //knop dus ingedrukt
+									 //nu iets doen, dcc boodschap aanmaken bv. 
+				TKNOPSTATE2 = !TKNOPSTATE2;
+				MAKEPACKET(2, 4, TKNOPSTATE2);
+			}
+			else {
+				TKNOPSTATUS2 = false; //knop dus losgelaten
+			}
+		}
+///************KNOP3
+		if (digitalRead(10) != TKNOPSTATUS3) { //status knop dus veranderd
+			if (TKNOPSTATUS3 == false) {
+				TKNOPSTATUS3 = true; //knop dus ingedrukt
+									 //nu iets doen, dcc boodschap aanmaken bv. 
+				TKNOPSTATE3 = !TKNOPSTATE3;
+				MAKEPACKET(2, 6, TKNOPSTATE3);
+			}
+			else {
+				TKNOPSTATUS3 = false; //knop dus losgelaten
+			}
+		}
+  ///***********KNOP4
+		if (digitalRead(11) != TKNOPSTATUS4) { //status knop dus veranderd
+			if (TKNOPSTATUS4 == false) {
+				TKNOPSTATUS4 = true; //knop dus ingedrukt
+									 //nu iets doen, dcc boodschap aanmaken bv. 
+				TKNOPSTATE4 = !TKNOPSTATE4;
+				MAKEPACKET(4, 10, TKNOPSTATE4);
+			}
+			else {
+				TKNOPSTATUS4 = false; //knop dus losgelaten
+			}
+		}
+}
 
 void START() { // deze functie start de controller, eventueel oproepen uit setup
   STOP = false;
@@ -109,30 +186,34 @@ void DCCLOOP() {
   */
   switch (DCCFASE) {
       int i;
+	  	  	  
     case 0: //Pauze bits verzenden en Teverzenden Packet zoeken.
+
+	  POINTERREAD++;
+	  if (POINTERREAD > AP) POINTERREAD = 0; //per doorloop 1 van de DCCpacket plekken checken alleen in case 0, dus geen packet in behandeling
+
       if (millis() - BITTIMER > BITFALSE) { // even millis van gemaakt tijdens ontwikkeling, moet micros zijn als mede hieronder.
         BITPART = !BITPART;
         SETOUTPUTS(BITPART);
         BITTIMER = millis();
       }
 
-      i = 0;
-      while (i < AP) {
-        if ((PACKETACTIVE == false) & (DCCPACKET[POINTERREAD].LOOPS > 0)) { //dus een nieuw te zenden packet gevonden
+      //Serial.println(DCCPACKET[POINTERREAD].LOOPS);
+		//  delay(500);
+
+        if ((PACKETACTIVE == false) && (DCCPACKET[POINTERREAD].LOOPS > 0)) { //dus een nieuw te zenden packet gevonden
           NEWPACKET = POINTERREAD;
           PACKETACTIVE = true; //Packet actief is waar
           CONSTRUCTBYTES();
-          DCCFASE = 1; // volgende doorloop naar fase 1 (preample verzenden)
-        } else { //Loops van deze = 0
-          ++ POINTERREAD; //volgende testen
+          DCCFASE = 1; // volgende doorloop naar fase 1 (preample verzenden)       
         }
-        i ++ ;
-      }
       //als geen te zenden packet wordt gevonden, gebeurt er dus niks nada, en wordt het pauze bit doorgezet.
       break;
 
     case 1: //1e fase in packet verzenden, bytes aanmaken
-
+		//als we hier zijn aangekomen is er een te verzenden boodschap. dus NEWPACKET =true;
+		Serial.println("jawel we hebben een message te verzenden");
+		NOODSTOP();
 
       break;
 
@@ -294,13 +375,18 @@ void setup() {
   pinMode(13, OUTPUT); // rode led
   pinMode(5, INPUT); //kortsluiting voeler
   pinMode(6, INPUT); //programmeerknop
+  //**tijdelijk bedienknoppen
+  pinMode(8, INPUT);
+  pinMode(9, INPUT);
+  pinMode(10, INPUT);
+
   
   Serial.begin(9600);
   while (!Serial)  {
 	  ;
   }
   //**alleen tijdens ontwikkeling
-  MAKEPACKETS();
+ // MAKEPACKET(); //na 28jan niet meer nodig
   // START();
 }
 
@@ -308,18 +394,25 @@ void loop() {
   ///Alleen tijdens ontwikkeling
   //PRINT(); //de aangemaakte packets
   //*******************
-  DCCLOOP();
-  /*
+  // DCCLOOP();
+
      if (STOP == false) { //in noodstop, alleen knop uitlezen
     DCCLOOP();
     }
-       if (digitalRead(5) == LOW and STOP == false) NOODSTOP();
+
+
+       if (digitalRead(5) == LOW && STOP == false) NOODSTOP();
+
        if (millis() - KNOPTIMER > 100) {
         KNOPTIMER = millis();
         KNOP();
+		TKNOP(); //deze tijdelijk komt straks NIET in de library, zet tijdelijk even een opdracht in de rij. 
     }
-  */
 
+//*********hiertussen komt stratks NIET in de library maar in het aansturend deel
+
+
+//*************************************************
 } //einde void loop
 
 
