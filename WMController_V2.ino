@@ -10,6 +10,8 @@
 
 // Variabelen
 //**********************
+
+//TIJDELIJKE VARIABELEN alleen in ontwerpfase
 int WELKEKNOP = 0; //telt de knoppen dit NIET in library ?? 
 boolean TKNOPSTATUS1 = false;
 boolean TKNOPSTATUS2 = false;
@@ -20,17 +22,19 @@ boolean TKNOPSTATE2 = false;
 boolean TKNOPSTATE3 = false;
 boolean TKNOPSTATE4 = false;
 
+
+
+//BLIJVENDE variabelen
 unsigned long KNOPTIMER;
 boolean KNOPSTATUS = false; //geeft de vorige stand van de programmeerknop
 boolean STOP = true;
-//**tijdelijke knoppen
-boolean TKNOP1=false; //geeft de stand van de knop bij de vorige doorloop
-boolean TKNOP2=false;
-boolean TKNOP3=false;
 
-int BITFALSE = 120; // duur van de helft van een pauze bit enof nul bit
+
+
 unsigned long BITTIMER; // houdt verlopen tijd bij gedurende een bit
 int DCCFASE = 0; // welke fase  in DC verzending
+int NEXTDCCFASE = 0; //geeft aan naar welk dccfase wordt gegaan na afloop van een nul bit.
+int VANDCCFASE = 0; //uit welke fase wordt het nulbit aangevraagd.
 boolean BITPART = true; //welke helft van het bit is momenteel aktief, pos of neg.
 boolean BYTEA1[8]; // byte adres 1, volgorde 0 1 2 3 4 5 6 7 
 boolean BYTED1[8]; //byte data 1
@@ -39,6 +43,8 @@ boolean BYTEE[8]; // byte error
 const int AP = 12; //aantal DCC packets, kun je uitbreiden als de boel op aantal vastloopt
 typedef struct DCCPACKET{ //packets definieren in void MAKEPACKETS?
   int LOOPS; //aantal keren dat moet worden doorlopen
+  int LOOPTIME; //Periode tussen twee keer dit packett verzenden in millisec
+  unsigned long LOOPTIMER; //tijd waarop laatste keer dit packett is verzonden 
   int ADRES; // humaan dcc adres
   boolean STATE; //accessoire aan of uit, links of rechts
 }
@@ -47,13 +53,15 @@ DCCPACKETS DCCPACKET[AP]; //aantal aangemaakte packets
 
 int POINTERREAD = 0; //pointer read onthoud welke packet laatst is gelezen
 int POINTERWRITE = 0; // pointer write welk packet het laatse is ingeschreven
-int NEWPACKET; //Current packet, packet wat wordt verzonden
-boolean PACKETACTIVE = false; //Geeft aan dat een packet actief is dus wordt verzonden
+int POINTERBYTE; //POINTER wijst naar welk BYTE er wordt verzonden
+int POINTERBIT; //POinter wijst naar welk bit van een byte wordt verzonden
 
 //Functies, voids
 //**************************
-void MAKEPACKET(int loops, int adres, boolean state) { //gebruikt is ontwikkeling om voorbeeld packets te maken.
-//aleerst een vrij packett zoeken, beginnen bij laatse POINTERWRITE
+void MAKEPACKET(int loops, int looptime, int adres, boolean state) { 
+//Maakt packet, DCC command. 
+//aleerst een vrij packet zoeken, beginnen bij laatse POINTERWRITE
+//loops is aantal doorlopen , Looptimer= tijd tussen twee uitvoeringen in millisec standaard ff 250ms, adres is humaan decimaal dcc adres, state = aan of uit bit 3 van databyte. 
 	int TELLER = 0;
 	boolean FOUNDFREE = false;
 	do
@@ -65,10 +73,13 @@ void MAKEPACKET(int loops, int adres, boolean state) { //gebruikt is ontwikkelin
 	{
 		FOUNDFREE = true;
 		DCCPACKET[POINTERWRITE].LOOPS=loops;
+		DCCPACKET[POINTERWRITE].LOOPTIME = looptime;
+		DCCPACKET[POINTERWRITE].LOOPTIMER = millis() + looptime; 
 		DCCPACKET[POINTERWRITE].ADRES = adres;
 		DCCPACKET[POINTERWRITE].STATE = state;
-		Serial.println(DCCPACKET[POINTERWRITE].ADRES = adres);
-		Serial.println(POINTERWRITE);
+
+		//Serial.println(DCCPACKET[POINTERWRITE].ADRES = adres);
+		//Serial.println(POINTERWRITE);
 
 		TELLER = AP + 2; // om uit de do while te springen
 	} // niet vrij gebeurt niks, volgende POINTERWRITE testen.
@@ -82,9 +93,9 @@ void MAKEPACKET(int loops, int adres, boolean state) { //gebruikt is ontwikkelin
 
 
 
-void SETOUTPUTS(boolean HL) {
-  digitalWrite(3, HL);
-  digitalWrite(4, !HL);
+void SETOUTPUTS(boolean hl) {
+  digitalWrite(3, hl);
+  digitalWrite(4, !hl);
 }
 
 void NOODSTOP() {
@@ -104,7 +115,7 @@ void TKNOP() { //deze functie NIET IN DE LIBRARY
 				TKNOPSTATUS1 = true; //knop dus ingedrukt
 				//nu iets doen, dcc boodschap aanmaken bv. 
 				TKNOPSTATE1 = !TKNOPSTATE1;
-				MAKEPACKET(4,1, TKNOPSTATE1);
+				MAKEPACKET(1,250,1, TKNOPSTATE1);
 				}else {
 				TKNOPSTATUS1 = false; //knop dus losgelaten
 			}
@@ -115,7 +126,7 @@ void TKNOP() { //deze functie NIET IN DE LIBRARY
 				TKNOPSTATUS2 = true; //knop dus ingedrukt
 									 //nu iets doen, dcc boodschap aanmaken bv. 
 				TKNOPSTATE2 = !TKNOPSTATE2;
-				MAKEPACKET(2, 4, TKNOPSTATE2);
+				MAKEPACKET(4,250, 4, TKNOPSTATE2);
 			}
 			else {
 				TKNOPSTATUS2 = false; //knop dus losgelaten
@@ -127,7 +138,7 @@ void TKNOP() { //deze functie NIET IN DE LIBRARY
 				TKNOPSTATUS3 = true; //knop dus ingedrukt
 									 //nu iets doen, dcc boodschap aanmaken bv. 
 				TKNOPSTATE3 = !TKNOPSTATE3;
-				MAKEPACKET(2, 6, TKNOPSTATE3);
+				MAKEPACKET(3,250, 6, TKNOPSTATE3);
 			}
 			else {
 				TKNOPSTATUS3 = false; //knop dus losgelaten
@@ -139,7 +150,7 @@ void TKNOP() { //deze functie NIET IN DE LIBRARY
 				TKNOPSTATUS4 = true; //knop dus ingedrukt
 									 //nu iets doen, dcc boodschap aanmaken bv. 
 				TKNOPSTATE4 = !TKNOPSTATE4;
-				MAKEPACKET(4, 10, TKNOPSTATE4);
+				MAKEPACKET(4,250, 10, TKNOPSTATE4);
 			}
 			else {
 				TKNOPSTATUS4 = false; //knop dus losgelaten
@@ -152,6 +163,7 @@ void START() { // deze functie start de controller, eventueel oproepen uit setup
   digitalWrite(12, HIGH);
   digitalWrite(13, LOW);
   SETOUTPUTS(true);
+  BITPART = true;
 
 
 } //einde void START
@@ -171,8 +183,8 @@ void KNOP() { // acties na indrukken knop
   }
 } //einde void knop
 
-// vanaf hier straks in een aparte library doen.
-void DCCLOOP() {
+
+void DCCLOOP() { //verzend de commands, packets.
   /*
        Achter een volgend
        Status 0 : Haal volgend packet op, vertaal naar bytes
@@ -184,49 +196,111 @@ void DCCLOOP() {
        Status 3 : eindig nulbit Zend BYTE
    *    *
   */
-  switch (DCCFASE) {
-      int i;
-	  	  	  
-    case 0: //Pauze bits verzenden en Teverzenden Packet zoeken.
+   int i;
 
-	  POINTERREAD++;
-	  if (POINTERREAD > AP) POINTERREAD = 0; //per doorloop 1 van de DCCpacket plekken checken alleen in case 0, dus geen packet in behandeling
+  switch (DCCFASE) {  
+ 	  	  
+    case 0: //Te verzenden packet zoeken, als geen een nulbit verzenden	  
 
-      if (millis() - BITTIMER > BITFALSE) { // even millis van gemaakt tijdens ontwikkeling, moet micros zijn als mede hieronder.
-        BITPART = !BITPART;
-        SETOUTPUTS(BITPART);
-        BITTIMER = millis();
-      }
-
-      //Serial.println(DCCPACKET[POINTERREAD].LOOPS);
-		//  delay(500);
-
-        if ((PACKETACTIVE == false) && (DCCPACKET[POINTERREAD].LOOPS > 0)) { //dus een nieuw te zenden packet gevonden
-          NEWPACKET = POINTERREAD;
-          PACKETACTIVE = true; //Packet actief is waar
-          CONSTRUCTBYTES();
-          DCCFASE = 1; // volgende doorloop naar fase 1 (preample verzenden)       
-        }
-      //als geen te zenden packet wordt gevonden, gebeurt er dus niks nada, en wordt het pauze bit doorgezet.
+		POINTERREAD ++; //volgende pointer, ook doen als dccpacket verzonden is...
+		if (POINTERREAD > AP-1) POINTERREAD = 0; //per doorloop 1 van de DCCpacket plekken checken alleen in case 0, dus geen packet in behandeling
+	     if (DCCPACKET[POINTERREAD].LOOPS > 0) { //dus een nieuw te zenden packet gevonden
+			 if (millis() - DCCPACKET[POINTERREAD].LOOPTIMER > DCCPACKET[POINTERREAD].LOOPTIME)
+			 { //is er voldoende tijd verlopen.
+				 CONSTRUCTBYTES();
+				 //  Serial.println("..........");
+				  // Serial.println(POINTERREAD);
+				   //Serial.println(DCCPACKET[POINTERREAD].LOOPS);
+				   //Serial.println("...........");
+				 DCCPACKET[POINTERREAD].LOOPS--; //aantal te doorlopen verkleinen
+				 DCCFASE = 1; // volgende doorloop naar fase 1 (preample verzenden)  
+				 DCCPACKET[POINTERREAD].LOOPTIMER = millis(); //reset timer voor deze packet-plek
+			 }
+			 else { //tijd nog niet verlopen dus volgende pointer
+				 NEWBIT(0);
+				 DCCFASE = 100;
+			 }
+		  }
+		  else { //geen te verzenden packett gevonden, dus nulbit verzenden, DAARNA weer opnieuw na dccfase 0
+			  NEWBIT(0);
+			  DCCFASE = 100; //volgende doorloop voor nulbit, BITPART komt false retour
+			}
+		
       break;
 
     case 1: //1e fase in packet verzenden, bytes aanmaken
 		//als we hier zijn aangekomen is er een te verzenden boodschap. dus NEWPACKET =true;
-		Serial.println("jawel we hebben een message te verzenden");
-		NOODSTOP();
+		//verzenden van het gevonden Packet waar POINTERREAD naar wijst. Beginnen  met een preample van 15 true bit.
 
+		SENDTRUE(15); //is blocking, anders niet snel genoeg. Timing is hier kritisch
+		NEWBIT(2); //hier wordt aangegeven naar welke dccfase als het nulbit klaar is
+		DCCFASE = 100; //volgende doorloop naar fase 2, verzend een 0 bit 
+		
       break;
 
     case 2:
+		Serial.println("preamble en 1 nul bit verzonden, nu eerste byte...");
+		
+		//**************einde packetverzendng
+		DCCFASE = 0; 
+		// POINTERREAD++;
+		//****************
       break;
+	case 3:
+		NOODSTOP();
+		break;
 
-    case 3:
+
+
+    case 100: 
+		
+		/*verzend een nulbit, deze is NIET blocking dus wordt telkens doorlopen tot bit klaar is. Daarna naar volgende DCCfase
+		we stellen dat bij start van het nulbit outputs true staan, bij het verlaten van het nulbit staan ze laag
+		bittimer moet gelijk  gesteld zijn aan micros, setoutputs(true)
+		*/
+
+		// Serial.print("hier");
+
+		if(millis()-BITTIMER > 120) //  if (micros()-BITTIMER > 120) //tijd verlopen werkend micros, test millis
+		{
+			if (BITPART==true)
+			{
+			SETOUTPUTS(false);
+			BITPART = false;
+			BITTIMER = millis(); // micros();
+			}
+			else {
+				//tijdverlopen, nu teruggeven aan aan DCCFASE
+				DCCFASE = NEXTDCCFASE; 
+			}
+
+		}
       break;
 
   }
 
 
 } //einde DCCLOOP()
+void NEWBIT(int nextdccfase) { //maakt alle standaard instellingen voor een new bit
+	SETOUTPUTS(true);
+	BITPART = true;
+	NEXTDCCFASE = nextdccfase;
+	BITTIMER = millis(); //micros();
+}
+void SENDTRUE(int count) { // aantal waar bits verzenden, voorlopig deze void blocking maken. 
+	int i = count;
+	while (i > 0)
+	{
+		SETOUTPUTS(true);
+		delay(58); //delayMicroseconds(58); //millis in test, micros in werking
+		SETOUTPUTS(false);
+		delay(58); //delayMicroseconds(58);
+		i--;
+		
+	}
+	BITPART = false;
+} //merkop outputs worden dus in de false stand achtergelaten...
+
 
 void CONSTRUCTBYTES() {
   // cp current packet, zojuist gevonden message. tellen vanaf 0 --01234567
@@ -240,41 +314,10 @@ void CONSTRUCTBYTES() {
     max adres = 2047
   */
 
-  int REST = DCCPACKET[NEWPACKET].ADRES;
+  int REST = DCCPACKET[POINTERREAD].ADRES;
   int BITWAARDE = 2048;
   int i = 0; //teller
-  
-  /*
-  if (REST - BITWAARDE >  0) {
-    BYTED1[6] = false; //adres hoger dan 2048, dit bit wordt geinverteerd (one complement)
-    REST = REST - BITWAARDE; //adres verminderen met waarde van dit JA bit
-  } else {
-    BYTED1[6] = true;
-  }
-    BITWAARDE = BITWAARDE / 2;
-
-  //Bitwaarde nu 1024 bepalen bit 5 van Byte 2, one complement dus geinverteerd. 
-  if (REST - BITWAARDE > 0) {
-	  BYTED1[5] = false; //bitwaarde is hoger dan waarde van bit 5, geinverteerde weergegeven
-	  REST = REST - BITWAARDE;
-	    }else {
-	  BYTED1[5] = true;
-	  } 
-  BITWAARDE = BITWAARDE / 2;
-
- //BITWAARDE nu 512 bepalen bit 4 van byte 2, one complement
-  if (REST - BITWAARDE > 0) {
-	  //Serial.print("HIER!");
-	  BYTED1[4] = 0;
-	  REST = REST - BITWAARDE;
-  }  else {
-	  BYTED1[4] = 1;
-  }
-  BITWAARDE = BITWAARDE / 2;
-  
-  */
-  //samenstellen adresbits 4-5-6 van BYTED1, geinverteerd volgens normblad one complement.
-  i = 6;
+    i = 6;
   while (i > 3) {
   if (REST - BITWAARDE >= 0) {
 	  //Serial.print("HIER!");
@@ -336,7 +379,7 @@ void CONSTRUCTBYTES() {
   BYTEA1[7] = true;
   BYTEA1[6] = false;
   BYTED1[7] = true;
-  BYTED1[4] = DCCPACKET[NEWPACKET].STATE; //aan of uit.
+  BYTED1[4] = DCCPACKET[POINTERREAD].STATE; //aan of uit.
   i = 0;
   while (i < 8) {
 	  BYTEE[i] = BYTEA1[i] ^ BYTED1[i];
@@ -349,24 +392,28 @@ void CONSTRUCTBYTES() {
 }// einde void constructbytes
 
 void PRINTBYTES() {
+	//Serial.print(" adres: ");
+	//Serial.println(DCCPACKET[POINTERREAD].ADRES);
+	//Serial.println("----------");
+
 	int i = 7;
 	while (i >= 0) {
 		Serial.print(BYTEA1[i]);
 		i--;
 	}
-	Serial.println();
+		Serial.println();
 	i = 7;
 	while (i >= 0) {
 		Serial.print(BYTED1[i]);
 		i --;
 		}
-Serial.println();
+		Serial.println();
 	i = 7;
 	while (i >= 0 ) {
 		Serial.print(BYTEE[i]);
 		i --;
 	}
-Serial.println();
+		Serial.println();
 }
 void setup() {
   pinMode(3, OUTPUT); //Hbrug
@@ -376,9 +423,12 @@ void setup() {
   pinMode(5, INPUT); //kortsluiting voeler
   pinMode(6, INPUT); //programmeerknop
   //**tijdelijk bedienknoppen
+  
+  //tijdelijk als input knoppen
   pinMode(8, INPUT);
   pinMode(9, INPUT);
   pinMode(10, INPUT);
+  pinMode(11, INPUT);
 
   
   Serial.begin(9600);
