@@ -55,6 +55,7 @@ int POINTERREAD = 0; //pointer read onthoud welke packet laatst is gelezen
 int POINTERWRITE = 0; // pointer write welk packet het laatse is ingeschreven
 int POINTERBYTE; //POINTER wijst naar welk BYTE er wordt verzonden
 int POINTERBIT; //POinter wijst naar welk bit van een byte wordt verzonden
+int COUNTTRUEBIT = 0;
 
 //Functies, voids
 //**************************
@@ -126,7 +127,7 @@ void TKNOP() { //deze functie NIET IN DE LIBRARY
 				TKNOPSTATUS2 = true; //knop dus ingedrukt
 									 //nu iets doen, dcc boodschap aanmaken bv. 
 				TKNOPSTATE2 = !TKNOPSTATE2;
-				MAKEPACKET(4,250, 4, TKNOPSTATE2);
+				MAKEPACKET(2,250, 4, TKNOPSTATE2);
 			}
 			else {
 				TKNOPSTATUS2 = false; //knop dus losgelaten
@@ -164,6 +165,7 @@ void START() { // deze functie start de controller, eventueel oproepen uit setup
   digitalWrite(13, LOW);
   SETOUTPUTS(true);
   BITPART = true;
+  DCCFASE = 0;
 
 
 } //einde void START
@@ -197,104 +199,180 @@ void DCCLOOP() { //verzend de commands, packets.
    *    *
   */
    int i;
-
-  switch (DCCFASE) {  
- 	  	  
-    case 0: //Te verzenden packet zoeken, als geen een nulbit verzenden	  
-
-		POINTERREAD ++; //volgende pointer, ook doen als dccpacket verzonden is...
-		if (POINTERREAD > AP-1) POINTERREAD = 0; //per doorloop 1 van de DCCpacket plekken checken alleen in case 0, dus geen packet in behandeling
-	     if (DCCPACKET[POINTERREAD].LOOPS > 0) { //dus een nieuw te zenden packet gevonden
-			 if (millis() - DCCPACKET[POINTERREAD].LOOPTIMER > DCCPACKET[POINTERREAD].LOOPTIME)
-			 { //is er voldoende tijd verlopen.
-				 CONSTRUCTBYTES();
-				 //  Serial.println("..........");
-				  // Serial.println(POINTERREAD);
-				   //Serial.println(DCCPACKET[POINTERREAD].LOOPS);
-				   //Serial.println("...........");
-				 DCCPACKET[POINTERREAD].LOOPS--; //aantal te doorlopen verkleinen
-				 DCCFASE = 1; // volgende doorloop naar fase 1 (preample verzenden)  
-				 DCCPACKET[POINTERREAD].LOOPTIMER = millis(); //reset timer voor deze packet-plek
-			 }
-			 else { //tijd nog niet verlopen dus volgende pointer
-				 NEWBIT(0);
-				 DCCFASE = 100;
-			 }
-		  }
-		  else { //geen te verzenden packett gevonden, dus nulbit verzenden, DAARNA weer opnieuw na dccfase 0
-			  NEWBIT(0);
-			  DCCFASE = 100; //volgende doorloop voor nulbit, BITPART komt false retour
-			}
-		
-      break;
-
-    case 1: //1e fase in packet verzenden, bytes aanmaken
-		//als we hier zijn aangekomen is er een te verzenden boodschap. dus NEWPACKET =true;
-		//verzenden van het gevonden Packet waar POINTERREAD naar wijst. Beginnen  met een preample van 15 true bit.
-
-		SENDTRUE(15); //is blocking, anders niet snel genoeg. Timing is hier kritisch
-		NEWBIT(2); //hier wordt aangegeven naar welke dccfase als het nulbit klaar is
-		DCCFASE = 100; //volgende doorloop naar fase 2, verzend een 0 bit 
-		
-      break;
-
-    case 2:
-		Serial.println("preamble en 1 nul bit verzonden, nu eerste byte...");
-		
-		//**************einde packetverzendng
-		DCCFASE = 0; 
-		// POINTERREAD++;
-		//****************
-      break;
-	case 3:
-		NOODSTOP();
-		break;
+   boolean BIT;
 
 
+   switch (DCCFASE) {
 
-    case 100: 
-		
-		/*verzend een nulbit, deze is NIET blocking dus wordt telkens doorlopen tot bit klaar is. Daarna naar volgende DCCfase
-		we stellen dat bij start van het nulbit outputs true staan, bij het verlaten van het nulbit staan ze laag
-		bittimer moet gelijk  gesteld zijn aan micros, setoutputs(true)
-		*/
+   case 0: //Te verzenden packet zoeken, als geen een nulbit verzenden	  
 
-		// Serial.print("hier");
+	   POINTERREAD++; //volgende pointer, ook doen als dccpacket verzonden is...
+	   if (POINTERREAD > AP - 1) POINTERREAD = 0; //per doorloop 1 van de DCCpacket plekken checken alleen in case 0, dus geen packet in behandeling
+	   if (DCCPACKET[POINTERREAD].LOOPS > 0) { //dus een nieuw te zenden packet gevonden
+		   if (millis() - DCCPACKET[POINTERREAD].LOOPTIMER > DCCPACKET[POINTERREAD].LOOPTIME)
+		   { //is er voldoende tijd verlopen.
+			   CONSTRUCTBYTES();
+			   //  Serial.println("..........");
+				// Serial.println(POINTERREAD);
+				 //Serial.println(DCCPACKET[POINTERREAD].LOOPS);
+				 //Serial.println("...........");
+			   DCCPACKET[POINTERREAD].LOOPS--; //aantal te doorlopen verkleinen
+			   DCCFASE = 1; // volgende doorloop naar fase 1 (preample verzenden)  
+			   DCCPACKET[POINTERREAD].LOOPTIMER = millis(); //reset timer voor deze packet-plek
+		   }
+		   else { //tijd nog niet verlopen dus volgende pointer
+			   NEWBIT(0, 10, 10);
+			   DCCFASE = 100;
+		   }
+	   }
+	   else { //geen te verzenden packett gevonden, dus nulbit verzenden, DAARNA weer opnieuw na dccfase 0
+		   NEWBIT(0, 10, 10);
+	   }
 
-		if(millis()-BITTIMER > 120) //  if (micros()-BITTIMER > 120) //tijd verlopen werkend micros, test millis
-		{
-			if (BITPART==true)
-			{
-			SETOUTPUTS(false);
-			BITPART = false;
-			BITTIMER = millis(); // micros();
-			}
-			else {
-				//tijdverlopen, nu teruggeven aan aan DCCFASE
-				DCCFASE = NEXTDCCFASE; 
-			}
+	   break;
 
-		}
-      break;
+   case 1: //1e fase in packet verzenden, bytes aanmaken
+	   //als we hier zijn aangekomen is er een te verzenden boodschap. dus NEWPACKET =true;
+	   //verzenden van het gevonden Packet waar POINTERREAD naar wijst. Beginnen  met een preample van 15 true bit.
 
-  }
+	   SENDTRUE(15); //verzenden preample,voorlopig blokking, anders niet snel genoeg. Timing is hier kritisch
+	   NEWBIT(2, 1, 7); //hier wordt aangegeven in welke dccfase en met welk byte en bit verder gaan als klaar, via NEXTDCCFASE, doorgegeven via NEWBIT die wordt bepaald in case 100
+	   Serial.println("preamble en 1 nul bit verzonden, nu bytes...");
+	   break;
+
+   case 2: //verzenden bytes
+	   /*
+	   We stellen voorlopig alleen te werken met 3 bytes commandoos, later is dit vast wel uit te breiden.
+	   Newbit aangeroepen vanuit case 1 heeft POINTERBYTE nu op 1 gezet en POINTERBIT op 7
+	   case 100 maakt alleen maar een nulbit en geeft de DCCFASE door
+	   */
+
+	   BIT = false;
+	   if (POINTERBIT < 0)
+	   {//a //byte klaar
+		   POINTERBYTE++;
+		   Serial.print("Zend tussenbit false     POINTERBYTE= ");
+		   Serial.print(POINTERBYTE);
+		   Serial.print("     POINTERBIT=  ");
+		   Serial.println(POINTERBIT);
+
+		   NEWBIT(2, POINTERBYTE, 7);
+
+	   }//a  Byte is nog niet klaar, gewoon doorgaan
+
+	   
 
 
+
+	   switch (POINTERBYTE) {
+	   case 1:
+		   if (BYTEA1[POINTERBIT] == true) BIT = true;
+		   break;
+	   case 2:
+		   if (BYTED1[POINTERBIT] == true) BIT = true;
+		   break;
+	   case 3:
+		   if (BYTEE[POINTERBIT] == true) BIT = true;
+		   break;
+	   }
+
+	   if (BIT == true) { //**1
+		   COUNTTRUEBIT++; //als gevonden bit is true ... verhogen zo aantal aaneengesloten true bits tellen.
+
+		   if (POINTERBIT == 0) {
+			   //dus laatste bit van dit Byte, nu de true bits ook zenden 
+			   SENDTRUE(COUNTTRUEBIT); //zend aangesloten true bits, pointerbit staat nu op een nulbit
+			   COUNTTRUEBIT = 0; //True counter weer nul stellen
+		   }
+
+		   POINTERBIT--;
+	   } //1
+	   else  //dus BIT=false
+	   { //2
+		   if (COUNTTRUEBIT > 0)
+		   {//3 volgend bit is een nul, dus getelde true bits nu verzenden
+			   SENDTRUE(COUNTTRUEBIT); //zend aangesloten true bits, pointerbit staat nu op een nulbit
+			   COUNTTRUEBIT = 0; //True counter weer nul stellen
+		   } //3
+
+		   Serial.print("send false     POINTERBYTE= "); //regulier false bit zenden 
+		   Serial.print(POINTERBYTE);
+		   Serial.print("     POINTERBIT=  ");
+		   Serial.println(POINTERBIT);
+
+		   NEWBIT(2, POINTERBYTE, POINTERBIT - 1);
+
+		   if (POINTERBYTE > 3)
+		   {//b  Command klaar
+			   Serial.println("Zend afsluitende true bits");
+			   SENDTRUE(3); //3 willekeurig gekozen
+			   DCCFASE = 4; //weer naar begin, tijdelijk 4 is alles stoppen
+
+		   }//b 
+
+	   } //2
+	   break;
+
+   case 4:
+	   NOODSTOP();
+	   break;
+
+   case 100:
+
+	   /*verzend een nulbit, deze is NIET blocking dus wordt telkens doorlopen tot bit klaar is. Daarna naar volgende DCCfase
+	   we stellen dat bij start van het nulbit outputs true staan, bij het verlaten van het nulbit staan ze laag
+	   bittimer moet gelijk  gesteld zijn aan micros, setoutputs(true)
+	   */
+
+	   // Serial.print("hier");
+
+	   if (millis() - BITTIMER > 150) //  if (micros()-BITTIMER > 120) //tijd verlopen werkend micros, test millis
+	   {
+		   if (BITPART == true)
+		   {
+			   SETOUTPUTS(false);
+			   BITPART = false;
+			   BITTIMER = millis(); // micros();
+		   }
+		   else {
+			   //tijdverlopen, nu teruggeven aan DCCFASE
+			   DCCFASE = NEXTDCCFASE;
+		   }
+
+	   }
+	   break;
+	   	   
+
+  } // einde switch
 } //einde DCCLOOP()
-void NEWBIT(int nextdccfase) { //maakt alle standaard instellingen voor een new bit
+
+
+void NEWBIT(int nextdccfase,int pointerbyte, int pointerbit) { //maakt alle standaard instellingen voor een new bit
 	SETOUTPUTS(true);
 	BITPART = true;
 	NEXTDCCFASE = nextdccfase;
 	BITTIMER = millis(); //micros();
+	POINTERBYTE = pointerbyte;
+	POINTERBIT = pointerbit;
+	DCCFASE = 100; //via DCCfase case 100 in DCCLOOP wordt een false bit verkregen, daarna naar NEXTDCCFASE dit wordt in case 100 ingesteld
 }
 void SENDTRUE(int count) { // aantal waar bits verzenden, voorlopig deze void blocking maken. 
+
+	Serial.print("Truebits: ");
+	Serial.print(COUNTTRUEBIT);
+	Serial.print("    POINTERBYTE= ");
+	Serial.print(POINTERBYTE);
+	Serial.print("     POINTERBIT=  ");
+	Serial.println(POINTERBIT);
+
+
 	int i = count;
 	while (i > 0)
 	{
 		SETOUTPUTS(true);
-		delay(58); //delayMicroseconds(58); //millis in test, micros in werking
+		delay(50); //delayMicroseconds(58); //millis in test, micros in werking
 		SETOUTPUTS(false);
-		delay(58); //delayMicroseconds(58);
+		delay(50); //delayMicroseconds(58);
 		i--;
 		
 	}
@@ -371,9 +449,9 @@ void CONSTRUCTBYTES() {
 	  }
   }
 
-  Serial.println();
-  Serial.print("Restwaarde adres:");
-  Serial.println(REST);
+ // Serial.println();
+ // Serial.print("Restwaarde adres:");
+//  Serial.println(REST);
 
   //invullen vaste bits voor aanduiding wat voor packet, message.
   BYTEA1[7] = true;
@@ -392,9 +470,9 @@ void CONSTRUCTBYTES() {
 }// einde void constructbytes
 
 void PRINTBYTES() {
-	//Serial.print(" adres: ");
-	//Serial.println(DCCPACKET[POINTERREAD].ADRES);
-	//Serial.println("----------");
+	Serial.print(" adres: ");
+	Serial.println(DCCPACKET[POINTERREAD].ADRES);
+	Serial.println("----------");
 
 	int i = 7;
 	while (i >= 0) {

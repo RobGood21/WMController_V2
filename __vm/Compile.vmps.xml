@@ -9,47 +9,47 @@
       <VCCodeMacros />
     </VCCodeModel>
     <BreakPoints>
-      <BreakPoint Index="1" Name="WMController_V2.ino, line 441" Id="42aca851-d61a-4109-8e35-f03d596e93c6" Enabled="1" Message="  Millis is currently {millis()}.&#xD;&#xA;    This tutorial debug trace point prints a message every 250ms&#xD;&#xA;    The break point property called 'Continue Execution' controls if code should pause here and wait for you to click 'Continue'.&#xD;&#xA;    To stop debug, click stop debugging or close/stop the serial monitor.&#xD;&#xA;    When debug ends, serial debug will continue to break/pause the mcu or transmit trace message, wifi debug will not.&#xD;&#xA;    This breakpoint exists at the start of the loop() function, where you see a red dot.&#xD;&#xA;    The red dot is a ‘breakpoint’. Edit the properties of a breakpoint by right clicking it or open the 'Debug&gt;Other Windows&gt;Breakpoint List'&#xD;&#xA;    This breakpoint is automatically set by Visual Micro to demonstrate the Arduino debugger.&#xD;&#xA;    Add your own breakpoints by placing the cursor on any code line and pressing F9. Press F9 again to delete the breakpoint.&#xD;&#xA;    Read more about the Visual Micro debugger at http://www.visualmicro.com/page/Debugging-for-Arduino.aspx&#xD;&#xA;    Take some time to learn about debugging, it’s worth it!&#xD;&#xA;    To switch the demo breakpoint and other tips off, deselect Visual Micro&gt;Tutorial Mode.&#xD;&#xA;    Switch debugging off by changing from tool bar (Configuratin) from 'Debug' to 'Release'" MessageTextType="0" PreProcessedMessage="  Millis is currently {0}.&#xD;&#xA;    This tutorial debug trace point prints a message every 250ms&#xD;&#xA;    The break point property called 'Continue Execution' controls if code should pause here and wait for you to click 'Continue'.&#xD;&#xA;    To stop debug, click stop debugging or close/stop the serial monitor.&#xD;&#xA;    When debug ends, serial debug will continue to break/pause the mcu or transmit trace message, wifi debug will not.&#xD;&#xA;    This breakpoint exists at the start of the loop() function, where you see a red dot.&#xD;&#xA;    The red dot is a ‘breakpoint’. Edit the properties of a breakpoint by right clicking it or open the 'Debug&gt;Other Windows&gt;Breakpoint List'&#xD;&#xA;    This breakpoint is automatically set by Visual Micro to demonstrate the Arduino debugger.&#xD;&#xA;    Add your own breakpoints by placing the cursor on any code line and pressing F9. Press F9 again to delete the breakpoint.&#xD;&#xA;    Read more about the Visual Micro debugger at http://www.visualmicro.com/page/Debugging-for-Arduino.aspx&#xD;&#xA;    Take some time to learn about debugging, it’s worth it!&#xD;&#xA;    To switch the demo breakpoint and other tips off, deselect Visual Micro&gt;Tutorial Mode.&#xD;&#xA;    Switch debugging off by changing from tool bar (Configuratin) from 'Debug' to 'Release'" Condition="millis()&gt;0 || millis()&gt;1" ConditionType="1" CurrentHits="0" File="c:\users\rob\source\repos\wmcontroller_v2\wmcontroller_v2.ino" FileLine="441" FileColumn="1" FunctionName="" FunctionLineOffset="1" FunctionColumnOffset="1" HitCountTarget="250" HitCountType="4" Language="C++" LocationType="3" Tag="&lt;vmbp Id='42aca851-d61a-4109-8e35-f03d596e93c6'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="0">
-        <Source>434		  ;
-435	  }
-436	  //**alleen tijdens ontwikkeling
-437	 // MAKEPACKET(); //na 28jan niet meer nodig
-438	  // START();
-439	}
-440	
---&gt;441	void loop() {
-442	  ///Alleen tijdens ontwikkeling
-443	  //PRINT(); //de aangemaakte packets
-444	  //*******************
-445	  // DCCLOOP();
-446	
-447	     if (STOP == false) { //in noodstop, alleen knop uitlezen
-448	    DCCLOOP();
-449	    }
-450	
+      <BreakPoint Index="1" Name="WMController_V2.ino, line 521" Id="42aca851-d61a-4109-8e35-f03d596e93c6" Enabled="1" Message="  Millis is currently {millis()}.&#xD;&#xA;    This tutorial debug trace point prints a message every 250ms&#xD;&#xA;    The break point property called 'Continue Execution' controls if code should pause here and wait for you to click 'Continue'.&#xD;&#xA;    To stop debug, click stop debugging or close/stop the serial monitor.&#xD;&#xA;    When debug ends, serial debug will continue to break/pause the mcu or transmit trace message, wifi debug will not.&#xD;&#xA;    This breakpoint exists at the start of the loop() function, where you see a red dot.&#xD;&#xA;    The red dot is a ‘breakpoint’. Edit the properties of a breakpoint by right clicking it or open the 'Debug&gt;Other Windows&gt;Breakpoint List'&#xD;&#xA;    This breakpoint is automatically set by Visual Micro to demonstrate the Arduino debugger.&#xD;&#xA;    Add your own breakpoints by placing the cursor on any code line and pressing F9. Press F9 again to delete the breakpoint.&#xD;&#xA;    Read more about the Visual Micro debugger at http://www.visualmicro.com/page/Debugging-for-Arduino.aspx&#xD;&#xA;    Take some time to learn about debugging, it’s worth it!&#xD;&#xA;    To switch the demo breakpoint and other tips off, deselect Visual Micro&gt;Tutorial Mode.&#xD;&#xA;    Switch debugging off by changing from tool bar (Configuratin) from 'Debug' to 'Release'" MessageTextType="0" PreProcessedMessage="  Millis is currently {0}.&#xD;&#xA;    This tutorial debug trace point prints a message every 250ms&#xD;&#xA;    The break point property called 'Continue Execution' controls if code should pause here and wait for you to click 'Continue'.&#xD;&#xA;    To stop debug, click stop debugging or close/stop the serial monitor.&#xD;&#xA;    When debug ends, serial debug will continue to break/pause the mcu or transmit trace message, wifi debug will not.&#xD;&#xA;    This breakpoint exists at the start of the loop() function, where you see a red dot.&#xD;&#xA;    The red dot is a ‘breakpoint’. Edit the properties of a breakpoint by right clicking it or open the 'Debug&gt;Other Windows&gt;Breakpoint List'&#xD;&#xA;    This breakpoint is automatically set by Visual Micro to demonstrate the Arduino debugger.&#xD;&#xA;    Add your own breakpoints by placing the cursor on any code line and pressing F9. Press F9 again to delete the breakpoint.&#xD;&#xA;    Read more about the Visual Micro debugger at http://www.visualmicro.com/page/Debugging-for-Arduino.aspx&#xD;&#xA;    Take some time to learn about debugging, it’s worth it!&#xD;&#xA;    To switch the demo breakpoint and other tips off, deselect Visual Micro&gt;Tutorial Mode.&#xD;&#xA;    Switch debugging off by changing from tool bar (Configuratin) from 'Debug' to 'Release'" Condition="millis()&gt;0 || millis()&gt;1" ConditionType="1" CurrentHits="0" File="c:\users\rob\source\repos\wmcontroller_v2\wmcontroller_v2.ino" FileLine="521" FileColumn="1" FunctionName="" FunctionLineOffset="1" FunctionColumnOffset="1" HitCountTarget="250" HitCountType="4" Language="C++" LocationType="3" Tag="&lt;vmbp Id='42aca851-d61a-4109-8e35-f03d596e93c6'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="0">
+        <Source>514		  ;
+515	  }
+516	  //**alleen tijdens ontwikkeling
+517	 // MAKEPACKET(); //na 28jan niet meer nodig
+518	  // START();
+519	}
+520	
+--&gt;521	void loop() {
+522	  ///Alleen tijdens ontwikkeling
+523	  //PRINT(); //de aangemaakte packets
+524	  //*******************
+525	  // DCCLOOP();
+526	
+527	     if (STOP == false) { //in noodstop, alleen knop uitlezen
+528	    DCCLOOP();
+529	    }
+530	
 </Source>
         <MessageVariables>
           <MessageVariable Name="millis()" Index="1" />
         </MessageVariables>
       </BreakPoint>
-      <BreakPoint Index="2" Name="WMController_V2.ino, line 208" Id="9b0fa182-bc68-4c10-9c1d-2b1a44983543" Enabled="0" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="c:\users\rob\source\repos\wmcontroller_v2\wmcontroller_v2.ino" FileLine="208" FileColumn="1" FunctionName="DCCLOOP()" FunctionLineOffset="33" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='9b0fa182-bc68-4c10-9c1d-2b1a44983543'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
-        <Source>201	    case 0: //Te verzenden packet zoeken, als geen een nulbit verzenden	  
-202	
-203			POINTERREAD ++; //volgende pointer, ook doen als dccpacket verzonden is...
-204			if (POINTERREAD &gt; AP-1) POINTERREAD = 0; //per doorloop 1 van de DCCpacket plekken checken alleen in case 0, dus geen packet in behandeling
-205		     if (DCCPACKET[POINTERREAD].LOOPS &gt; 0) { //dus een nieuw te zenden packet gevonden
-206				 if (millis() - DCCPACKET[POINTERREAD].LOOPTIMER &gt; DCCPACKET[POINTERREAD].LOOPTIME)
-207				 { //is er voldoende tijd verlopen.
---&gt;208					 CONSTRUCTBYTES();
-209					 //  Serial.println("..........");
-210					  // Serial.println(POINTERREAD);
-211					   //Serial.println(DCCPACKET[POINTERREAD].LOOPS);
-212					   //Serial.println("...........");
-213					 DCCPACKET[POINTERREAD].LOOPS--; //aantal te doorlopen verkleinen
-214					 DCCFASE = 1; // volgende doorloop naar fase 1 (preample verzenden)  
-215					 DCCPACKET[POINTERREAD].LOOPTIMER = millis(); //reset timer voor deze packet-plek
-216				 }
-217				 else { //tijd nog niet verlopen dus volgende pointer
+      <BreakPoint Index="2" Name="WMController_V2.ino, line 214" Id="9b0fa182-bc68-4c10-9c1d-2b1a44983543" Enabled="0" Message="" MessageTextType="2" PreProcessedMessage="" Condition="" ConditionType="1" CurrentHits="0" File="c:\users\rob\source\repos\wmcontroller_v2\wmcontroller_v2.ino" FileLine="214" FileColumn="1" FunctionName="DCCLOOP()" FunctionLineOffset="33" FunctionColumnOffset="1" HitCountTarget="1" HitCountType="1" Language="C++" LocationType="3" Tag="&lt;vmbp Id='9b0fa182-bc68-4c10-9c1d-2b1a44983543'/&gt;" Type="1" ToString="System.__ComObject" BreakWhenHit="1">
+        <Source>207	   case 0: //Te verzenden packet zoeken, als geen een nulbit verzenden	  
+208	
+209		   POINTERREAD++; //volgende pointer, ook doen als dccpacket verzonden is...
+210		   if (POINTERREAD &gt; AP - 1) POINTERREAD = 0; //per doorloop 1 van de DCCpacket plekken checken alleen in case 0, dus geen packet in behandeling
+211		   if (DCCPACKET[POINTERREAD].LOOPS &gt; 0) { //dus een nieuw te zenden packet gevonden
+212			   if (millis() - DCCPACKET[POINTERREAD].LOOPTIMER &gt; DCCPACKET[POINTERREAD].LOOPTIME)
+213			   { //is er voldoende tijd verlopen.
+--&gt;214				   CONSTRUCTBYTES();
+215				   //  Serial.println("..........");
+216					// Serial.println(POINTERREAD);
+217					 //Serial.println(DCCPACKET[POINTERREAD].LOOPS);
+218					 //Serial.println("...........");
+219				   DCCPACKET[POINTERREAD].LOOPS--; //aantal te doorlopen verkleinen
+220				   DCCFASE = 1; // volgende doorloop naar fase 1 (preample verzenden)  
+221				   DCCPACKET[POINTERREAD].LOOPTIMER = millis(); //reset timer voor deze packet-plek
+222			   }
+223			   else { //tijd nog niet verlopen dus volgende pointer
 </Source>
       </BreakPoint>
     </BreakPoints>
